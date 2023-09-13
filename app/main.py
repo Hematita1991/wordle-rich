@@ -1,6 +1,22 @@
-# from rich import print
 from rich.console import Console
 from rich.text import Text
+import os
+import inspect
+import random
+
+
+FILENAME_VALID_WORDS = "valid_words.txt"
+CURRENT_DIRECTORY = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+FILE_PATH_VALID_WORDS = os.path.join(CURRENT_DIRECTORY, "data", FILENAME_VALID_WORDS)
+
+
+def get_valid_words():
+    valid_words = list()
+    file_data = open(FILE_PATH_VALID_WORDS,"r")
+    for x in file_data.readlines():
+        valid_words.append(x.strip())
+    file_data.close()
+    return valid_words
 
 
 class Game(object):
@@ -11,6 +27,10 @@ class Game(object):
         self.grid = None
         self.correct_word = "apple"
         self.use_rich = use_rich
+    
+    def set_correct_word(self, word_list):
+        self.correct_word = random.choice(word_list)
+        # print(f"WORD TO BE GUESSED IS {self.correct_word}")
     
     def update_round(self):
         self.current_round += 1
@@ -82,9 +102,11 @@ class Grid(object):
 
 
 if __name__ == '__main__':
+    VALID_WORDS = get_valid_words()
     play_game = True
     use_rich = True
     game = Game(use_rich=use_rich)
+    game.set_correct_word(VALID_WORDS)
     game.setup_grid()
     console = Console()
     text_obj = TextSettings()
@@ -113,13 +135,15 @@ if __name__ == '__main__':
                 offer_new_game = False
 
         if offer_new_game:
-            user_input_new_game = input("Would you like to play another game? Enter Y or N: ")
+            user_input_new_game = input("""Would you like to play another game? Please enter Y to play a new game. To exit the game, press any other key. Enter your response here: """)
 
-            if user_input_new_game == "N":
-                print("Thank you for playing. Goodbye.")
-                play_game = False
-            elif user_input_new_game == "Y":
-                print("Capital! New game will start shortly...")
+            if user_input_new_game == "Y":
+                print("Capital! A new game will start shortly...")
                 play_game = True
                 game = Game(use_rich=use_rich)
+                game.set_correct_word(VALID_WORDS)
                 game.setup_grid()
+            else:
+                print("Thank you for playing. Goodbye.")
+                play_game = False               
+            
